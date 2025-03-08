@@ -37,6 +37,10 @@ jobs:
 
       - name: Run terraform plan
         run: terraform plan
+        env:
+          TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
       
       - name: Run terraform apply
         run: terraform apply -auto-approve
+        env:
+          TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
