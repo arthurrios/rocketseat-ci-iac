@@ -24,7 +24,8 @@ resource "aws_iam_role" "tf-role" {
         "StringEquals" : {
           "token.actions.githubusercontent.com:sub" : [
             "repo:arthurrios/rocketseat-ci-iac:ref:refs/heads/main",
-            "repo:arthurrios/rocketseat-ci-iac:ref:refs/heads/dev"
+            "repo:arthurrios/rocketseat-ci-iac:ref:refs/heads/dev",
+            "repo:arthurrios/rocketseat-ci-iac:pull_request"
           ],
           "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com"
         }
