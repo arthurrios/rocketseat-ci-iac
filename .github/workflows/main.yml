@@ -16,7 +16,9 @@ on:
 
 permissions: 
   id-token: write
-  contents: read
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
 
@@ -27,11 +29,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ${{ secrets.AWS_REGION  }}
+          aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/tf-role
           role-session-name: GitHubActions-Prod-${{ github.run_id }}
 
@@ -54,7 +59,7 @@ jobs:
           TF_VAR_environment: "prod"
       
       - name: Run terraform apply
-        run: terraform apply -auto-approve -var-file=prod.tfvars
+        run: terraform apply -auto-approve
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
