@@ -33,6 +33,7 @@ jobs:
         with:
           aws-region: ${{ secrets.AWS_REGION  }}
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/tf-role
+          role-session-name: GitHubActions-Prod-${{ github.run_id }}
 
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v3
