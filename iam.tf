@@ -36,7 +36,81 @@ resource "aws_iam_role" "tf-role" {
   }
 }
 
-resource "aws_iam_role_policy" "my_policy" {
+resource "aws_iam_role_policy" "tf_policy" {
+  name = "tf-permission"
+  role = aws_iam_role.tf-role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid      = "Statement1",
+      Action   = "ecr:*",
+      Effect   = "Allow",
+      Resource = "*"
+      },
+      {
+        Sid      = "Statement2",
+        Action   = "iam:*",
+        Effect   = "Allow",
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role" "app-runner-role" {
+  name = "app-runner-role"
+
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          Service = "build.apprunner.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    IAC = true
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "app-runner-role-ecr" {
+  role       = aws_iam_role.app-runner-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+resource "aws_iam_role" "ecr_role" {
+  name = "ecr_role"
+
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    Statement = [{
+      "Principal" : {
+        "Federated" : "arn:aws:iam::266735825067:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action" : "sts:AssumeRoleWithWebIdentity",
+      "Condition" : {
+        "StringEquals" : {
+          "token.actions.githubusercontent.com:sub" : "repo:arthurrios/rocketseat-ci-api:ref:refs/heads/main",
+          "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com"
+        }
+      }
+      Effect = "Allow"
+      },
+    ]
+  })
+
+  tags = {
+    IAC = true
+  }
+}
+
+resource "aws_iam_role_policy" "ecr_policy" {
   name = "ecr-app-permission"
   role = aws_iam_role.ecr_role.id
 
@@ -74,56 +148,4 @@ resource "aws_iam_role_policy" "my_policy" {
       }
     ]
   })
-}
-
-resource "aws_iam_role_policy_attachment" "app-runner-role-ecr" {
-  role       = aws_iam_role.app-runner-role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-}
-
-resource "aws_iam_role" "app-runner-role" {
-  name = "app-runner-role"
-
-  assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Principal" : {
-          Service = "build.apprunner.amazonaws.com"
-        },
-        "Action" : "sts:AssumeRole"
-      }
-    ]
-  })
-
-  tags = {
-    IAC = true
-  }
-}
-
-resource "aws_iam_role" "ecr_role" {
-  name = "ecr_role"
-
-  assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    Statement = [{
-      "Principal" : {
-        "Federated" : "arn:aws:iam::266735825067:oidc-provider/token.actions.githubusercontent.com"
-      },
-      "Action" : "sts:AssumeRoleWithWebIdentity",
-      "Condition" : {
-        "StringEquals" : {
-          "token.actions.githubusercontent.com:sub" : "repo:arthurrios/rocketseat-ci-api:ref:refs/heads/main",
-          "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com"
-        }
-      }
-      Effect = "Allow"
-      },
-    ]
-  })
-
-  tags = {
-    IAC = true
-  }
 }
