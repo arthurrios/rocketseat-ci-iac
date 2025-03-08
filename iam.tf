@@ -17,18 +17,20 @@ resource "aws_iam_role" "tf-role" {
     "Version" : "2012-10-17",
     Statement = [{
       "Principal" : {
-        "Federated" : "arn:aws:iam::266735825067:oidc-provider/token.actions.githubusercontent.com"
+        "Federated" : "arn:aws:iam::${var.aws_account_id}:oidc-provider/token.actions.githubusercontent.com"
       },
       "Action" : "sts:AssumeRoleWithWebIdentity",
       "Condition" : {
         "StringEquals" : {
-          "token.actions.githubusercontent.com:sub" : "repo:arthurrios/rocketseat-ci-iac:ref:refs/heads/main",
+          "token.actions.githubusercontent.com:sub" : [
+            "repo:arthurrios/rocketseat-ci-iac:ref:refs/heads/main",
+            "repo:arthurrios/rocketseat-ci-iac:ref:refs/heads/dev"
+          ],
           "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com"
         }
-      }
-      Effect = "Allow"
       },
-    ]
+      Effect = "Allow"
+    }]
   })
 
   tags = {
