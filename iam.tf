@@ -10,6 +10,32 @@ resource "aws_iam_openid_connect_provider" "oidc-git" {
   }
 }
 
+resource "aws_iam_role" "tf-role" {
+  name = "tf-role"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+        Statement = [{
+        "Principal": {
+            "Federated": "arn:aws:iam::266735825067:oidc-provider/token.actions.githubusercontent.com"
+        },
+        "Action": "sts:AssumeRoleWithWebIdentity",
+        "Condition": {
+          "StringEquals": {
+              "token.actions.githubusercontent.com:sub": "repo:arthurrios/rocketseat-ci-iac:ref:refs/heads/main",
+              "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+          }
+        }
+        Effect = "Allow"
+      },
+    ]
+  })
+
+  tags = {
+    IAC = true
+  }
+}
+
 resource "aws_iam_role_policy" "my_policy" {
   name        = "ecr-app-permission"
   role        = aws_iam_role.ecr_role.id
