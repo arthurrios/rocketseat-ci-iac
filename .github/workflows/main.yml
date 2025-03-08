@@ -54,7 +54,7 @@ jobs:
           TF_VAR_environment: "prod"
       
       - name: Run terraform apply
-        run: terraform apply -auto-approve -var-file=prod.tfvars
+        run: terraform apply -auto-approve
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
