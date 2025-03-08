@@ -8,6 +8,5 @@ terraform {
 }
 
 provider "aws" {
-  region  = "us-east-2"
-  profile = terraform.workspace == "default" ? "Admin" : null
+  region = "us-east-2"
 }
