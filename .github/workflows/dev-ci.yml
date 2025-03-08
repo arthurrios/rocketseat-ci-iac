@@ -1,18 +1,20 @@
-name: CI
+name: Development CI/CD
 
 on:
   push:
     branches:
-      - main
+      - dev
+  pull_request:
+    branches:
+      - dev
 
 permissions: 
   id-token: write
   contents: read
 
 jobs:
-
-  run-terraform:
-    name: Run Terraform
+  test-and-build:
+    name: Test and Build
     runs-on: ubuntu-latest
 
     steps:
@@ -22,8 +24,9 @@ jobs:
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ${{ secrets.AWS_REGION  }}
+          aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/tf-role
+          role-session-name: GitHubActions-Dev-${{ github.run_id }}
 
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v3
@@ -40,9 +43,13 @@ jobs:
         run: terraform plan
         env:
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+          TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+          TF_VAR_environment: "dev"
       
       - name: Run terraform apply
+        if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
         run: terraform apply -auto-approve
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+          TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+          TF_VAR_environment: "dev"
