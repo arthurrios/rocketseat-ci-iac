@@ -10,6 +10,7 @@ permissions:
   contents: read
 
 jobs:
+  
   run-terraform:
     name: Run Terraform
     runs-on: ubuntu-latest
@@ -27,7 +28,7 @@ jobs:
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.11.1
+          terraform_version: ${{ vars.TF_VERSION }}
 
       - name: Run terraform init
         run: terraform init
