@@ -109,6 +109,7 @@ resource "aws_iam_role" "ecr_role" {
       "Condition" : {
         "StringEquals" : {
           "token.actions.githubusercontent.com:sub" : "repo:arthurrios/rocketseat-ci-api:ref:refs/heads/main",
+          "token.actions.githubusercontent.com:sub" : "repo:arthurrios/rocketseat-ci-api:ref:refs/heads/dev",
           "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com"
         }
       }
