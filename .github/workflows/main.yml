@@ -4,9 +4,25 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**/*.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.prettierrc'
+      - '.releaserc'
+      - 'docker-compose.yaml'
+      - 'test/**'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '**/*.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.prettierrc'
+      - '.releaserc'
+      - 'docker-compose.yaml'
+      - 'test/**'
   workflow_run:
     workflows: ["Development CI/CD"]
     types:
